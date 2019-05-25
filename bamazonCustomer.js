@@ -19,15 +19,14 @@ connection.connect( err => {
 
 
 function homePage() {
-    let results = displayAllProducts()
-    console.log('results: ' + results)
+    displayAllProducts()
 
     console.log('\n\n\n')
     inquirer
         .prompt([
             {
                 type: 'input',
-                message: 'Type the id of the product you would like to buy',
+                message: 'Type the id of the product you would like to buy\n',
                 name: 'id'
             },
             {
@@ -37,18 +36,24 @@ function homePage() {
             }
         ])
         .then( answers => {
-            let selectedItem
+            let resArr = []
+            let selected
 
-            results.forEach( item => {
-                if (item.item_id === answers.id) selectedItem = item
+            connection.query('SELECT * FROM products', (err, results) => {
+
+                results.forEach( item => {
+                    resArr.push(item)
+                    if (item.item_id === answers.id) selected = item
+                })
+
+                console.log(resArr)
+                console.log('selected: ')
+                console.log(selected)
             })
-
-            if (selectedItem.stock_quantity < answers.amount) console.log('Insufficient quantity')
         })
 }
 
 function displayAllProducts() {
-    let resArr = []
     connection.query('SELECT * FROM products', (err, results) => {
         if (err) throw err 
 
@@ -57,13 +62,9 @@ function displayAllProducts() {
         })
         results.forEach( item => {
             table.push([item.item_id, item.product_name, item.department_name, item.price, item.stock_quantity])
-            resArr.push(item)
         })
 
         console.log('\n' + table.toString())
     })
-
-    connection.end()
-    return resArr
 }
 
