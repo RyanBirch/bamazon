@@ -71,7 +71,10 @@ function askUser() {
                     .then(answers => {
                         processTransaction(answers)
                     })
-            } else process.exit()
+            } else {
+                connection.end()
+                process.exit()
+            }
         })
 }
 
