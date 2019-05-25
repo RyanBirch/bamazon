@@ -48,37 +48,56 @@ function askUser() {
     console.log('\n')
     inquirer
         .prompt([{
-                type: 'input',
-                message: 'Type the id of the product you would like to buy',
-                name: 'id'
-            },
-            {
-                type: 'input',
-                message: 'How many units of the product would you like to buy?',
-                name: 'amount'
-            }
-        ])
-        .then(answers => {
-            let resArr = []
-            let selected
-
-            connection.query('SELECT * FROM products', (err, results) => {
-                if (err) throw err
-
-                // find the item the user selected in the database
-                results.forEach(item => {
-                    resArr.push(item)
-                    if (item.item_id === parseInt(answers.id)) selected = item
-                })
-
-                // check if store has sufficient quantity
-                if (selected.stock_quantity < answers.amount) console.log('Insufficient quantity')
-                else {
-                    console.log('Total cost: $' + selected.price * answers.amount)
-                    updateProducts(selected, answers.amount)
-                }
-            })
+            type: 'list',
+            message: 'What would you like to do?',
+            choices: ['Make a purchase', 'Exit'],
+            name: 'homeChoice'
+        }])
+        .then(answer => {
+            if (answer.homeChoice === 'Make a purchase') {
+                console.log('\n')
+                inquirer
+                    .prompt([{
+                            type: 'input',
+                            message: 'Type the id of the product you would like to buy',
+                            name: 'id'
+                        },
+                        {
+                            type: 'input',
+                            message: 'How many units of the product would you like to buy?',
+                            name: 'amount'
+                        }
+                    ])
+                    .then(answers => {
+                        processTransaction(answers)
+                    })
+            } else process.exit()
         })
+}
+
+function processTransaction(answers) {
+    let resArr = []
+    let selected
+
+    connection.query('SELECT * FROM products', (err, results) => {
+        if (err) throw err
+
+        // find the item the user selected in the database
+        results.forEach(item => {
+            resArr.push(item)
+            if (item.item_id === parseInt(answers.id)) selected = item
+        })
+
+        // check if store has sufficient quantity
+        if (selected.stock_quantity < answers.amount) {
+            console.log('\nInsufficient quantity')
+            homePage()
+        } else {
+            console.log('\nOrder successfully placed \nTotal cost: $' + selected.price * answers.amount)
+            updateProducts(selected, answers.amount)
+            homePage()
+        }
+    })
 }
 
 // update the database after a purchase
@@ -95,14 +114,21 @@ function updateProducts(item, amount) {
         ],
         (err, res) => {
             if (err) throw err
-            if (item.stock_quantity === 0) deleteProduct()
-            displayAllProducts()
+            if (item.stock_quantity === 0) deleteProduct(item)
         }
     )
 }
 
 // delete product from database if quantity is zero
-function deleteProduct() {
-
+function deleteProduct(item) {
+    connection.query(
+        'DELETE FROM products WHERE ?',
+        {
+            item_id: item.item_id
+        },
+        (err, res) => {
+            if (err) throw err 
+        }
+    )
 }
 
