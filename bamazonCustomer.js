@@ -62,25 +62,47 @@ function askUser() {
             let resArr = []
             let selected
 
-            // check the database to see if the store has enough of the item
             connection.query('SELECT * FROM products', (err, results) => {
                 if (err) throw err
 
+                // find the item the user selected in the database
                 results.forEach(item => {
                     resArr.push(item)
                     if (item.item_id === parseInt(answers.id)) selected = item
                 })
 
+                // check if store has sufficient quantity
                 if (selected.stock_quantity < answers.amount) console.log('Insufficient quantity')
                 else {
                     console.log('Total cost: $' + selected.price * answers.amount)
+                    updateProducts(selected, answers.amount)
                 }
             })
         })
 }
 
 // update the database after a purchase
-function updateProducts(item) {
+function updateProducts(item, amount) {
+    connection.query(
+        'UPDATE  products SET ? WHERE ?',
+        [
+            {
+                stock_quantity: item.stock_quantity - amount
+            },
+            {
+                item_id: item.item_id
+            }
+        ],
+        (err, res) => {
+            if (err) throw err
+            if (item.stock_quantity === 0) deleteProduct()
+            displayAllProducts()
+        }
+    )
+}
+
+// delete product from database if quantity is zero
+function deleteProduct() {
 
 }
 
