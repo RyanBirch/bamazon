@@ -117,20 +117,6 @@ function updateProducts(item, amount) {
         ],
         (err, res) => {
             if (err) throw err
-            if (item.stock_quantity === 0) deleteProduct(item)
-        }
-    )
-}
-
-// delete product from database if quantity is zero
-function deleteProduct(item) {
-    connection.query(
-        'DELETE FROM products WHERE ?',
-        {
-            item_id: item.item_id
-        },
-        (err, res) => {
-            if (err) throw err 
         }
     )
 }

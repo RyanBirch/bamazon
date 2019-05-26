@@ -19,6 +19,7 @@ connection.connect( err => {
 
 
 function askManager() {
+    console.log('\n')
     inquirer 
         .prompt([
             {
@@ -30,9 +31,9 @@ function askManager() {
         ])
         .then( answer => {
             if (answer.homeChoice === 'View Products For Sale') {
-                viewProducts()
+                viewProducts().then(askManager)
             } else if (answer.homeChoice === 'View Low Inventory') {
-                viewLowInventory()
+                viewLowInventory().then(askManager)
             } else if (answer.homeChoice === 'Add to Inventory') {
                 addToInventory()
             } else if (answer.homeChoice === 'Add New Product') {
@@ -45,11 +46,44 @@ function askManager() {
 }
 
 function viewProducts() {
-
+    return new Promise((resolve, reject) => {
+        // retrieve all items from the database to display to the user
+        connection.query('SELECT * FROM products', (err, results) => {
+            if (err) throw err 
+    
+            // display the items in a table
+            let table = new Table({
+                head: ['id', 'name', 'department', 'price', 'stock quantity']
+            })
+            results.forEach( item => {
+                table.push([item.item_id, item.product_name, item.department_name, item.price, item.stock_quantity])
+            })
+    
+            // print the table to the console
+            resolve(console.log('\n' + table.toString()))
+        })
+    })
 }
 
 function viewLowInventory() {
+    return new Promise((resolve, reject) => {
+        // retrieve all items from the database to display to the user
+        connection.query('SELECT * FROM products WHERE stock_quantity < ?', [5],
+            (err, results) => {
+                if (err) throw err
 
+                // display the items in a table
+                let table = new Table({
+                    head: ['id', 'name', 'department', 'price', 'stock quantity']
+                })
+                results.forEach(item => {
+                    table.push([item.item_id, item.product_name, item.department_name, item.price, item.stock_quantity])
+                })
+
+                // print the table to the console
+                resolve(console.log('\n' + table.toString()))
+            })
+    })
 }
 
 function addToInventory() {
