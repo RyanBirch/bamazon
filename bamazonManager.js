@@ -3,7 +3,7 @@ const inquirer = require('inquirer')
 const mysql = require('mysql')
 const Table = require('cli-table3')
 
-// connect
+// connect to database
 const connection = mysql.createConnection({
     host: 'localhost',
     port: 3306,
@@ -18,6 +18,7 @@ connection.connect( err => {
 })
 
 
+// home page
 function askManager() {
     console.log('\n')
     inquirer.prompt([
@@ -48,6 +49,7 @@ function askManager() {
     })
 }
 
+// view all products
 function viewProducts() {
     return new Promise((resolve, reject) => {
         // retrieve all items from the database to display to the user
@@ -68,9 +70,10 @@ function viewProducts() {
     })
 }
 
+// view products with less than 5 units in stock
 function viewLowInventory() {
     return new Promise((resolve, reject) => {
-        // retrieve all items from the database to display to the user
+        // retrieve items from the database to display to the user
         connection.query('SELECT * FROM products WHERE stock_quantity < ?', [5],
             (err, results) => {
                 if (err) throw err
@@ -91,6 +94,7 @@ function viewLowInventory() {
 
 // add more units of a specific item
 function addToInventory() {
+    // show user all products, then ask which one they want to update
     viewProducts().then(() => {
         inquirer.prompt([
             {
@@ -130,6 +134,8 @@ function addToInventory() {
                         }
                     ],
                     (err, res) => {
+                        if (err) throw err
+                        // return to home screen
                         askManager()
                     }
                 )
@@ -138,6 +144,43 @@ function addToInventory() {
     })
 }
 
+// add a new product to the database
 function addNewProduct() {
-
+    inquirer.prompt([
+        {
+            type: 'input',
+            message: 'What is the name of the product?',
+            name: 'name'
+        },
+        {
+            type: 'input',
+            message: 'Which department does the item go in?',
+            name: 'department'
+        },
+        {
+            type: 'input',
+            message: 'what is the price of the item?',
+            name: 'price'
+        },
+        {
+            type: 'input',
+            message: 'What is the stock quantity?',
+            name: 'stock'
+        }
+    ])
+    .then(answers => {
+        connection.query(
+            'INSERT INTO products SET ?',
+            {
+                product_name: answers.name,
+                department_name: answers.department,
+                price: answers.price,
+                stock_quantity: answers.stock
+            },
+            (err, res) => {
+                if (err) throw err
+                askManager()
+            }
+        )
+    })
 }
