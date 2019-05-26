@@ -46,36 +46,37 @@ function displayAllProducts() {
 // ask user what they want to buy
 function askUser() {
     console.log('\n')
-    inquirer
-        .prompt([{
+    inquirer.prompt([
+        {
             type: 'list',
             message: 'What would you like to do?',
             choices: ['Make a purchase', 'Exit'],
             name: 'homeChoice'
-        }])
-        .then(answer => {
-            if (answer.homeChoice === 'Make a purchase') {
-                console.log('\n')
-                inquirer
-                    .prompt([{
-                            type: 'input',
-                            message: 'Type the id of the product you would like to buy',
-                            name: 'id'
-                        },
-                        {
-                            type: 'input',
-                            message: 'How many units of the product would you like to buy?',
-                            name: 'amount'
-                        }
-                    ])
-                    .then(answers => {
-                        processTransaction(answers)
-                    })
-            } else {
-                connection.end()
-                process.exit()
-            }
-        })
+        }
+    ])
+    .then(answer => {
+        if (answer.homeChoice === 'Make a purchase') {
+            console.log('\n')
+            inquirer.prompt([
+                {
+                    type: 'input',
+                    message: 'Type the id of the product you would like to buy',
+                    name: 'id'
+                },
+                {
+                    type: 'input',
+                    message: 'How many units of the product would you like to buy?',
+                    name: 'amount'
+                }
+            ])
+            .then(answers => {
+                processTransaction(answers)
+            })
+        } else {
+            connection.end()
+            process.exit()
+        }
+    })
 }
 
 function processTransaction(answers) {
