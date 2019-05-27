@@ -31,10 +31,10 @@ function displayAllProducts() {
     
             // display the items in a table
             let table = new Table({
-                head: ['id', 'name', 'department', 'price', 'stock quantity']
+                head: ['id', 'name', 'department', 'price', 'stock quantity', 'product sales']
             })
             results.forEach( item => {
-                table.push([item.item_id, item.product_name, item.department_name, item.price, item.stock_quantity])
+                table.push([item.item_id, item.product_name, item.department_name, item.price, item.stock_quantity, item.product_sales])
             })
     
             // print the table to the console
@@ -49,7 +49,7 @@ function askUser() {
     inquirer.prompt([
         {
             type: 'list',
-            message: 'What would you like to do?',
+            message: 'Select an option',
             choices: ['Make a purchase', 'Exit'],
             name: 'homeChoice'
         }
@@ -107,10 +107,13 @@ function processTransaction(answers) {
 // update the database after a purchase
 function updateProducts(item, amount) {
     connection.query(
-        'UPDATE  products SET ? WHERE ?',
+        'UPDATE  products SET ?, ? WHERE ?',
         [
             {
                 stock_quantity: item.stock_quantity - amount
+            },
+            {
+                product_sales: item.product_sales + (item.price * amount)
             },
             {
                 item_id: item.item_id

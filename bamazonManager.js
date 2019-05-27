@@ -58,10 +58,10 @@ function viewProducts() {
     
             // display the items in a table
             let table = new Table({
-                head: ['id', 'name', 'department', 'price', 'stock quantity']
+                head: ['id', 'name', 'department', 'price', 'stock quantity', 'product sales']
             })
             results.forEach( item => {
-                table.push([item.item_id, item.product_name, item.department_name, item.price, item.stock_quantity])
+                table.push([item.item_id, item.product_name, item.department_name, item.price, item.stock_quantity, item.product_sales])
             })
     
             // print the table to the console
@@ -80,10 +80,10 @@ function viewLowInventory() {
 
                 // display the items in a table
                 let table = new Table({
-                    head: ['id', 'name', 'department', 'price', 'stock quantity']
+                    head: ['id', 'name', 'department', 'price', 'stock quantity', 'product sales']
                 })
                 results.forEach(item => {
-                    table.push([item.item_id, item.product_name, item.department_name, item.price, item.stock_quantity])
+                    table.push([item.item_id, item.product_name, item.department_name, item.price, item.stock_quantity, item.product_sales])
                 })
 
                 // print the table to the console
