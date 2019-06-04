@@ -17,6 +17,7 @@ connection.connect( err => {
     homePage()
 })
 
+
 // home page 
 function homePage() {
     displayAllProducts().then(askUser)
@@ -99,7 +100,7 @@ function processTransaction(answers) {
         } else {
             console.log('\nOrder successfully placed \nTotal cost: $' + selected.price * answers.amount)
             updateProducts(selected, answers.amount)
-            homePage()
+            askUser()
         }
     })
 }

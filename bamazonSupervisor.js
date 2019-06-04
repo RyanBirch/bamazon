@@ -30,10 +30,13 @@ function askSupervisor() {
     .then( answer => {
         if (answer.choice === 'View Product Sales by Department') {
             viewProductSales()
+
         } else if (answer.choice === 'Create New Department') {
             createNewDepartment()
+
         } else if (answer.choice === 'View Departments') {
-            viewDepartments()
+            viewDepartments().then(askSupervisor)
+            
         } else {
             connection.end()
             process.exit()
@@ -43,6 +46,33 @@ function askSupervisor() {
 
 function viewProductSales() {
 
+    // ************* need to fix this *************
+
+    let query = 
+    `
+        SELECT departments.department_id, departments.department_name, departments.over_head_costs, 
+            SUM(products.product_sales) FROM departments
+        JOIN products ON products.department_name = departments.department_name
+        GROUP BY departments.department_id
+    `
+
+    // ************* need to fix this *************
+
+    connection.query(query, (err, results) => {
+        if (err) throw err
+        
+        let table = new Table({
+            head: ['department_id', 'department_name', 'over_head_costs', 'product_sales']
+        })
+
+        results.forEach( item => {
+            table.push([item.department_id, item.department_name, item.over_head_costs, item.product_sales])
+        })
+
+        console.log('\n' + table.toString())
+
+        askSupervisor()
+    })
 }
 
 function createNewDepartment() {
@@ -70,25 +100,26 @@ function createNewDepartment() {
             },
             (err, res) => {
                 if (err) throw err
-                viewDepartments()
-                askSupervisor()
+                viewDepartments().then(askSupervisor)
             }
         )
     })
 }
 
 function viewDepartments() {
-    connection.query('SELECT * FROM departments', (err, results) => {
-        if (err) throw err 
-
-        let table = new Table({
-            head: ['id', 'department name', 'overhead costs']
+    return new Promise((resolve, reject) => {
+        connection.query('SELECT * FROM departments', (err, results) => {
+            if (err) throw err 
+    
+            let table = new Table({
+                head: ['id', 'department name', 'overhead costs']
+            })
+    
+            results.forEach( item => {
+                table.push([item.department_id, item.department_name, item.over_head_costs])
+            })
+    
+            resolve(console.log('\n' + table.toString()))
         })
-
-        results.forEach( item => {
-            table.push([item.department_id, item.department_name, item.over_head_costs])
-        })
-
-        console.log('\n' + table.toString())
     })
 }
