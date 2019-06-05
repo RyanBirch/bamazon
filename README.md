@@ -39,10 +39,14 @@ This is a command line Node.js application that utilizes a MySQL database to cre
 
 ## Demonstration
 * ### Customer View
-    <img src="!#">
+    <img src="images/bamazonCustomer.gif">
+
+    <br><br><br>
 
 * ### Manager View
-    <img src="!#">
+    <img src="images/bamazonManager.gif">
+
+    <br><br><br>
 
 * ### Supervisor View
-    <img src="!#">
+    <img src="images/bamazonSupervisor.gif">

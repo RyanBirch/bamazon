@@ -100,7 +100,7 @@ function processTransaction(answers) {
         } else {
             console.log('\nOrder successfully placed \nTotal cost: $' + selected.price * answers.amount)
             updateProducts(selected, answers.amount)
-            askUser()
+            displayAllProducts().then(askUser)
         }
     })
 }
