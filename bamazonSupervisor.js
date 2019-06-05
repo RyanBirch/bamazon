@@ -46,8 +46,6 @@ function askSupervisor() {
 
 function viewProductSales() {
 
-    // with JOIN
-
     let query = 
     `
         SELECT departments.department_id, departments.department_name, departments.over_head_costs, 
@@ -56,19 +54,6 @@ function viewProductSales() {
         JOIN products ON products.department_name = departments.department_name
         GROUP BY departments.department_id
     `
-
-
-    // without JOIN 
-
-    // let query2 = 
-    // `
-    //     SELECT departments.department_id, departments.department_name, departments.over_head_costs, 
-    //         SUM(products.product_sales) AS product_sales
-    //     FROM departments, products
-    //     WHERE products.department_name = departments.department_name
-    //     GROUP BY departments.department_id
-    // `
-
 
     connection.query(query, (err, results) => {
         if (err) throw err
