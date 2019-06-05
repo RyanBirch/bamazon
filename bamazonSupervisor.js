@@ -46,27 +46,39 @@ function askSupervisor() {
 
 function viewProductSales() {
 
-    // ************* need to fix this *************
+    // with JOIN
 
     let query = 
     `
         SELECT departments.department_id, departments.department_name, departments.over_head_costs, 
-            SUM(products.product_sales) FROM departments
+            SUM(products.product_sales) AS product_sales
+        FROM departments
         JOIN products ON products.department_name = departments.department_name
         GROUP BY departments.department_id
     `
 
-    // ************* need to fix this *************
+
+    // without JOIN 
+
+    // let query2 = 
+    // `
+    //     SELECT departments.department_id, departments.department_name, departments.over_head_costs, 
+    //         SUM(products.product_sales) AS product_sales
+    //     FROM departments, products
+    //     WHERE products.department_name = departments.department_name
+    //     GROUP BY departments.department_id
+    // `
+
 
     connection.query(query, (err, results) => {
         if (err) throw err
         
         let table = new Table({
-            head: ['department_id', 'department_name', 'over_head_costs', 'product_sales']
+            head: ['department_id', 'department_name', 'over_head_costs', 'product_sales', 'total_profit']
         })
 
         results.forEach( item => {
-            table.push([item.department_id, item.department_name, item.over_head_costs, item.product_sales])
+            table.push([item.department_id, item.department_name, item.over_head_costs.toFixed(2), item.product_sales.toFixed(2), (item.product_sales - item.over_head_costs).toFixed(2)])
         })
 
         console.log('\n' + table.toString())
